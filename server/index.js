@@ -9,10 +9,10 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "storage")));
 
 //route to display directory contents
-app.get("/", (req, res) => {
+app.get("/contents", (req, res) => {
   let path = req.query.path;
   try {
     const files = fs.readdirSync("." + path);
@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
         };
         result.push(data);
       } else {
-        filedirectory = path.replace("/public", "");
+        filedirectory = path.replace("/storage", "");
         let data = {
           isDirectory: false,
           filepath: "http://localhost:5000" + filedirectory + "/" + file,
@@ -41,5 +41,12 @@ app.get("/", (req, res) => {
   }
 });
 
+if (process.env.NODE_ENV === "production") {
+  //Static folder
+  app.use(express.static(path.join(__dirname, "/public/")));
+
+  //Handle single page application
+  app.get(/.*/, (req, res) => res.sendFile(__dirname + "/public/index.html"));
+}
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started at port ${PORT}`));

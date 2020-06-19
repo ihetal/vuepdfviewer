@@ -23,7 +23,7 @@
         </tbody>
       </table>
     </div>
-    <div class="pdf"><PDFDocument v-bind:url="url" :scale="scale" /></div>
+    <div class="pdf"><PDFDocument v-bind:url="url" /></div>
   </div>
 </template>
 
@@ -41,9 +41,9 @@ export default {
   data() {
     return {
       url: null,
-      scale: 1.8,
+
       files: [],
-      folder: "/public",
+      folder: "/storage",
     };
   },
   methods: {
@@ -53,28 +53,24 @@ export default {
     },
     viewDirectory(folder) {
       console.log(encodeURIComponent(folder));
-      axios.get(`http://localhost:5000/?path=${folder}`).then((res) => {
+      axios.get(`contents/?path=${folder}`).then((res) => {
         this.files = res.data.files;
       });
     },
     reload() {
-      console.log("clicked");
       window.location.reload();
     },
   },
   mounted() {
     console.log(encodeURIComponent(this.folder));
     axios
-      .get(`http://localhost:5000/?path=${this.folder}`)
+      .get(`contents/?path=${this.folder}`)
       .then((res) => {
         this.files = res.data.files;
       })
       .catch((err) => {
         if (err.response.data) alert(err.response.data.message);
       });
-  },
-  created() {
-    console.log("Created");
   },
 };
 </script>
